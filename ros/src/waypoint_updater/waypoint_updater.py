@@ -25,6 +25,8 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 70 # Number of waypoints we will publish. You can change this number
+MAX_DECEL = 1.0
+PUBLISH_FREQ_RATE = 27
 
 
 class WaypointUpdater(object):
@@ -34,6 +36,7 @@ class WaypointUpdater(object):
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
+#        rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
 
@@ -51,7 +54,7 @@ class WaypointUpdater(object):
         self.loop()
         
     def loop(self):
-        rate = rospy.Rate(50)
+        rate = rospy.Rate(PUBLISH_FREQ_RATE)
         while not rospy.is_shutdown():
             #if self.pose and self.base_waypoints:
             #    # Get closest waypoint
@@ -98,6 +101,8 @@ class WaypointUpdater(object):
         farthest_idx = closest_idx + LOOKAHEAD_WPS
         base_waypoints = self.base_lane.waypoints[closest_idx:farthest_idx]
 
+        #rospy.logwarn("stop line waypoint index: {0}".format(self.stopline_wp_idx))
+        #rospy.logwarn("farthest index: {0}".format(farthest_idx))
         if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
             lane.waypoints = base_waypoints
         else:
@@ -129,6 +134,9 @@ class WaypointUpdater(object):
         self.pose = msg
         #pass
 
+#    def velocity_cb(self, msg):
+#        self.current_vel = msg.twist.linear.x
+
     def waypoints_cb(self, waypoints):
         # TODO: Implement
         #self.base_waypoints = waypoints
@@ -142,7 +150,7 @@ class WaypointUpdater(object):
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
         self.stopline_wp_idx = msg.data
-        rospy.loginfo("traffic_cb stop line waypoint index: {0}".format(self.stopline_wp_idx))
+        #rospy.logwarn("Next Traffic Light stop line waypoint index: {0}".format(self.stopline_wp_idx))
         #pass
 
     def obstacle_cb(self, msg):

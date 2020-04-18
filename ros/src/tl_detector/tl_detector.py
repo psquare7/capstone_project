@@ -89,13 +89,16 @@ class TLDetector(object):
         if self.state != state:
             self.state_count = 0
             self.state = state
+            #rospy.loginfo('self.state != state')
         elif self.state_count >= STATE_COUNT_THRESHOLD:
             self.last_state = self.state
             light_wp = light_wp if state == TrafficLight.RED else -1
             self.last_wp = light_wp
             self.upcoming_red_light_pub.publish(Int32(light_wp))
+            #rospy.loginfo('self.state_count >= STATE_COUNT_THRESHOLD')
         else:
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
+            #rospy.loginfo('Else upcoming_red_light_pub')
         self.state_count += 1
 
     def get_closest_waypoint(self, x, y):
@@ -122,15 +125,15 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-#        if(not self.has_image):
-#            self.prev_light_loc = None
-#            return False
-#
-#        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-#
-#        #Get classification
-#        return self.light_classifier.get_classification(cv_image)
-        rospy.loginfo('State of light is %s', light.state)
+        #if(not self.has_image):
+        #    self.prev_light_loc = None
+        #    return False
+
+        #cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+
+        #Get classification
+        #return self.light_classifier.get_classification(cv_image)
+        #rospy.loginfo('State of light is %s', light.state)
         return light.state
 
     def process_traffic_lights(self):
@@ -163,11 +166,13 @@ class TLDetector(object):
                 closest_light = light
                 line_wp_idx = temp_wp_idx
 
-        rospy.loginfo('closest light state is %s', closest_light.state)
-        if closest_light:
+        #rospy.logwarn('closest light state is %s', closest_light.state)
+        if closest_light:    
             state = self.get_light_state(closest_light)
+            #rospy.logwarn('closest light state is: %s', state)
             return line_wp_idx, state
         #self.waypoints = None
+        #rospy.logwarn('closest light is -1')
         return -1, TrafficLight.UNKNOWN
 
 if __name__ == '__main__':
