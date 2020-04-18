@@ -113,7 +113,20 @@ class TLDetector(object):
         """
         #TODO implement
         closest_idx = self.waypoint_tree.query([x, y], 1)[1]
-        return closest_idx
+        
+        x = poseX
+        y = poseY
+        
+        waypoint_next = self.waypoints_2d [closest_idx]
+        set_next = np.array(waypoint_next)
+        waypoint_previous = self.waypoints_2d [closest_idx - 1]
+        set_previous = np.array(waypoint_previous)
+        positionXY = np.array([x,y])
+
+        if np.dot(set_next - set_previous, positionXY - set_next) > 0:
+            closest_path = (closest_idx + 1) % len(self.waypoints_2d)
+        
+        return closest_path
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
