@@ -46,8 +46,8 @@ class Controller(object):
         current_vel = self.vel_lpf.filt(current_vel)
 
         #log
-        rospy.logwarn("Target velocity: {0}".format(linear_vel))
-        rospy.logwarn("Current velocity: {0}".format(current_vel))
+        #rospy.logwarn("Target velocity: {0}".format(linear_vel))
+        #rospy.logwarn("Current velocity: {0}".format(current_vel))
 
         steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
 
@@ -64,7 +64,7 @@ class Controller(object):
         if linear_vel == 0. and current_vel < 0.1:
             throttle = 0
             brake = 400 # N*m To stop and hold the car at red light. Acceleration ~ 1m/s^2
-        elif throttle < 0.1 and vel_error < 0:
+        elif throttle < .1 and vel_error < 0:
             throttle = 0
             decel = max(vel_error, self.decel_limit)
             brake = abs(decel) * self.vehicle_mass * self.wheel_radius # Torque N*m
